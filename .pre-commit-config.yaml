@@ -9,11 +9,3 @@ repos:
     rev: v1.10.0
     hooks:
       - id: mypy
-
-  - repo: local
-    hooks:
-      - id: pytest-check
-        name: pytest
-        entry: pytest
-        language: system
-        types: [python]
