@@ -43,9 +43,9 @@ async def create_rule(payload: RuleCreate, db: AsyncSession = Depends(get_db)):
     user = user_result.scalars().first()
 
     if not user:
-        user = User(name=payload.user_name)
+        user = User(user_name=payload.user_name)
         db.add(user)
-        await db.flush()  # flush to assign user.id before using it
+        await db.flush()
 
     created_rules = []
 

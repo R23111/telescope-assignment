@@ -33,15 +33,13 @@ async def process_llm(question: str, context: str) -> bool:
             }
         ),
     )
-    return (
-        response.json()
-        .get("choices", [{}])[0]
-        .get("message", {})
-        .get("text", "")
-        .strip()
-        .lower()
-        == "true"
-    )
+    choices = response.json().get("choices", [])
+    if choices:
+        return (
+            choices[0].get("message", {}).get("text", "").strip().lower()
+            == "true"
+        )
+    return False
 
 
 async def evaluate_condition(condition, value):
