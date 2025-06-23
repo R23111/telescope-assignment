@@ -1,3 +1,13 @@
+"""
+Provides configuration and utilities for managing asynchronous interactions
+with a PostgreSQL database using SQLAlchemy and async sessions.
+
+This module sets up the asynchronous database engine using environment
+variables, initializes the session factory, and exposes a dependency-compatible
+session generator for use in FastAPI endpoints.
+"""
+
+
 import os
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine

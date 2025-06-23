@@ -11,7 +11,6 @@ services:
       POSTGRES_DB: telescope_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
 
@@ -29,6 +28,8 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+    entrypoint: >
+      bash -c "python app/core/wait_for_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
 volumes:
   postgres_data:
