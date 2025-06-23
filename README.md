@@ -40,22 +40,82 @@ source .venv/bin/activate
 pip install -r requirements-dev.txt
 ```
 
-1. Configure your environment variables in a `.env` file:
+3. Set up pre-commit hooks for code quality:
+
+```bash
+pre-commit install
+```
+
+This will automatically run linting and type checking before each commit. The pre-commit configuration includes:
+- **Ruff**: Fast Python linter and code formatter
+- **MyPy**: Static type checker for Python
+
+4. Configure your environment variables in a `.env` file:
 
 ```env
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/telescope
+OPENROUTER_API_KEY=your_openrouter_api_key_here  # Optional, for LLM features
 ```
 
-4. Ensure PostgreSQL is running locally and the database is created:
+5. Ensure PostgreSQL is running locally and the database is created:
 
 ```bash
 docker-compose up db
 ```
 
-5. Run the development server:
+6. Run the development server:
 
 ```bash
 uvicorn app.main:app --reload
+```
+
+#### Development Tools
+
+The project includes several development tools for code quality and consistency:
+
+**Linting and Formatting:**
+```bash
+# Run ruff linter
+ruff check .
+
+# Auto-fix linting issues
+ruff check . --fix
+
+# Format code
+ruff format .
+```
+
+**Type Checking:**
+```bash
+# Run mypy for type checking
+mypy app/
+```
+
+**Testing:**
+```bash
+# Run all tests
+pytest
+
+# Run tests with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/api/endpoints/companies_test.py
+
+# Run tests with coverage
+pytest --cov=app
+
+# Run tests for a specific function/class
+pytest -k "test_create_user"
+```
+
+**Pre-commit Hooks:**
+```bash
+# Run pre-commit on all files
+pre-commit run --all-files
+
+# Skip pre-commit hooks for a specific commit (not recommended)
+git commit --no-verify
 ```
 
 ---
@@ -87,7 +147,7 @@ Accepted input:
 
 ## LLM Operator Support
 
-To use rules involving a `"LLM"` operator, you must configure access to a language model provider. For instance, using [OpenRouter.ai]:
+To use rules involving a `"LLM"` operator, you must configure access to a language model provider. For instance, using [OpenRouter.ai](https://openrouter.ai):
 
 1. Sign up at https://openrouter.ai
 2. Obtain your API key
@@ -323,7 +383,7 @@ POST /create_rule
       "operation": {
         "target_object": "description",
         "operator": "LLM",
-        "value": "Based on the description, is this company a SaaA company?"
+        "value": "Based on the description, is this company a SaaS company?"
       },
       "match": 1,
       "default": 0
@@ -382,8 +442,35 @@ You can use either `AND` or `OR` as the top-level key, and its value must be a l
 Each condition object supports the following structure:
 
 * `target_object`: the field of the company being evaluated
-* `operator`: a comparison operation (e.g., `EQUALS`, `LESS_THAN`, `GREATER_THAN`)
+* `operator`: a comparison operation (see supported operators below)
 * `value`: the value to compare against
+
+#### Supported Operators
+
+The following operators are available for rule conditions:
+
+* **`EQUALS`**: Exact string/value match
+* **`NOT_EQUALS`**: Value does not match
+* **`GREATER_THAN`**: Numeric comparison (value > threshold)
+* **`LESS_THAN`**: Numeric comparison (value < threshold)
+* **`CONTAINS`**: String contains substring (case-sensitive)
+* **`NOT_CONTAINS`**: String does not contain substring
+* **`LLM`**: Uses AI/LLM evaluation for complex logic (requires OpenRouter API key)
+
+#### Available Target Objects
+
+Rules can target the following company fields:
+
+* **`name`**: Company name
+* **`founded_year`**: Year the company was founded
+* **`total_employees`**: Number of employees
+* **`headquarters_city`**: City where company is headquartered
+* **`employee_locations`**: Geographic distribution of employees
+* **`employee_growth_2y`**: Employee growth over 2 years (decimal)
+* **`employee_growth_1y`**: Employee growth over 1 year (decimal)
+* **`employee_growth_6m`**: Employee growth over 6 months (decimal)
+* **`description`**: Company description text
+* **`industry`**: Industry classification
 
 
 #### Response Format

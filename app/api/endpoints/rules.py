@@ -155,7 +155,9 @@ async def process_companies(payload: dict, db: AsyncSession = Depends(get_db)):
         )
 
     user_result = await db.execute(
-        select(User).options(selectinload(User.rules))
+        select(User)
+        .options(selectinload(User.rules))
+        .where(User.user_name == user_name)
     )
     user = user_result.scalars().first()
     if not user:
